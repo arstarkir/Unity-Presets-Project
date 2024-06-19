@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
     }
     void Jump()
     {
-        yVelocity += Mathf.Sqrt(jumpHeight * 2 * 9.81f);
+        yVelocity += Mathf.Sqrt(jumpHeight * 2 * 9.81f * Time.deltaTime);
     }
     bool IsGrounded()
     {
