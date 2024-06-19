@@ -46,6 +46,7 @@ public class PlayerController : MonoBehaviour
             Jump();
 
         Vector3 moveDirection = new Vector3(move.ReadValue<Vector2>().x, 0, move.ReadValue<Vector2>().y);
+        moveDirection = transform.TransformDirection(moveDirection);
         moveDirection *= speed;
 
         moveDirection.y = yVelocity;

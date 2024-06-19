@@ -60,8 +60,10 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.23f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\PlayerInput\PlayerInputActions.cs" />
+    <Compile Include="Assets\Scripts\Movement\CameraHolder.cs" />
+    <Compile Include="Assets\Scripts\Movement\MouseLook.cs" />
     <Compile Include="Assets\Scripts\Movement\PlayerController.cs" />
-    <Compile Include="Assets\Scripts\Movement\PlayerInputActions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
