@@ -61,7 +61,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Editor\Scripts\Dialogue\DialogueEditorWindow.cs" />
+    <Compile Include="Assets\Editor\Scripts\Dialogue\Connection.cs" />
     <Compile Include="Assets\Editor\Scripts\Dialogue\Node.cs" />
+    <Compile Include="Assets\Editor\Scripts\Dialogue\DialogueWindowObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

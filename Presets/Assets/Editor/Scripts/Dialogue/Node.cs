@@ -1,8 +1,7 @@
 using UnityEngine;
 
-public class Node
+public class Node : DialogueWindowObject
 {
-    public Rect rect;
     public Texture2D texture;
     public string title = "Node";
 
@@ -12,16 +11,13 @@ public class Node
         this.title = title;
         this.texture = texture;
     }
-    public void Draw()
+    public override void Draw(Color? color = null)
     {
+        base.Draw(color);
         if (texture != null)
             GUI.DrawTexture(rect, texture);
         else
             GUI.Box(rect, title);
-        GUI.Label(new Rect(rect.x + rect.width*1/4, rect.y, 40, 20), title);
-    }
-    public bool HasPoint(Vector2 point)
-    {
-        return rect.Contains(point);
+        //GUI.Label(new Rect(rect.x + rect.width*1/4, rect.y, 40, 20), title);
     }
 }
