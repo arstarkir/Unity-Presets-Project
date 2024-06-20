@@ -7,6 +7,7 @@ public class Node : DialogueWindowObject
 
     public Node(Vector2 position, float width, float height, string title, Texture2D texture = null)
     {
+        this.position = position;
         this.rect = new Rect(position.x, position.y, width, height);
         this.title = title;
         this.texture = texture;

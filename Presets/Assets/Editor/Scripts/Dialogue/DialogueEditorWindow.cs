@@ -1,9 +1,10 @@
 using NUnit.Framework;
+using Palmmedia.ReportGenerator.Core.Reporting.Builders;
 using System.Collections.Generic;
 using System.IO;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
-using static Codice.Client.BaseCommands.Import.Commit;
 
 public class DialogueEditorWindow : EditorWindow
 {
@@ -11,6 +12,10 @@ public class DialogueEditorWindow : EditorWindow
     List<Node> nodes = new List<Node>(); 
     List<Connection> connections = new List<Connection>();
     DialogueWindowObject selected = null;
+
+    //Ctrl + Shift + Z
+    Vector2 prevPos;
+    DialogueWindowObject lastaChanged;
 
     [MenuItem("Window/Dialogue Editor %#d")]
     static void OpenWindow()
@@ -22,27 +27,14 @@ public class DialogueEditorWindow : EditorWindow
     void OnGUI()
     {
         Event e = Event.current;
-        DrawGrid();
 
+        DrawGrid();
         foreach (Node node in nodes)
             node.Draw();
         foreach (Connection connection in connections)
             connection.Draw((connection == selected) ? Color.red : null);
 
         Events(e);
-
-        //Will need to fix
-        //Shortcuts
-        if (e.keyCode == KeyCode.N)
-        {
-            OnClickAddNode(e.mousePosition);
-            Repaint();
-        }
-        if (e.keyCode == KeyCode.C)
-        {
-            OnClickAddConnection(e.mousePosition);
-            Repaint();
-        }
 
         if (GUI.changed) Repaint();
     }
@@ -68,6 +60,11 @@ public class DialogueEditorWindow : EditorWindow
         {
             case EventType.MouseDown:
                 SelectNode(e.mousePosition);
+                if(selected != null)
+                {
+                    prevPos = new Vector2(selected.position.x, selected.position.y);
+                    lastaChanged = selected;
+                }
                 if (e.button == 1 && e.type == EventType.MouseDown)
                     OptionsMenu(e);
                 break;
@@ -81,7 +78,7 @@ public class DialogueEditorWindow : EditorWindow
                     }
                 }
                 break;
-            case EventType.MouseMove: //FIX HERE
+            case EventType.MouseMove:
                 if (selected != null && selected is Connection)
                 {
                     DragConnection(e.mousePosition);
@@ -94,26 +91,75 @@ public class DialogueEditorWindow : EditorWindow
                 break;
 
         }
+        Shortcuts(e);
+    }
+    void Shortcuts(Event e)
+    {
+        //Ctrl + Shift + Z
+        if (e.control && e.keyCode == KeyCode.Z && lastaChanged != null)
+        {
+            if (lastaChanged is Node)
+            {
+                if (lastaChanged.rect.position != prevPos)
+                {
+                    lastaChanged.position = prevPos;
+                    lastaChanged.rect.position = prevPos;
+                    lastaChanged = null;
+                }
+                else
+                {
+                    nodes.Remove((Node)lastaChanged);
+                    lastaChanged = null;
+                }
+                Repaint();
+            }
+            if (lastaChanged is Connection)
+            {
+                connections.Remove((Connection)lastaChanged);
+                lastaChanged = null;
+                Repaint();
+            }
+            
+        }
+        if(e.type == EventType.KeyDown)
+        {
+            //Ctrl + Shift + F
+            if (e.control && e.shift && e.keyCode == KeyCode.F)
+            {
+                OnClickAddNode(e.mousePosition);
+                Repaint();
+            }
+            //Ctrl + Shift + G
+            if (e.control && e.shift && e.keyCode == KeyCode.G)
+            {
+                OnClickAddConnection(e.mousePosition);
+                Repaint();
+            }
+        }
     }
     void OptionsMenu(Event e)
     {
         Vector2 mousePosition = e.mousePosition;
         GenericMenu genericMenu = new GenericMenu();
-        genericMenu.AddItem(new GUIContent("Add node"), false, () => OnClickAddNode(mousePosition));
-        genericMenu.AddItem(new GUIContent("Add Connection"), false, () => OnClickAddConnection(mousePosition));
+        genericMenu.AddItem(new GUIContent("Add node %#f"), false, () => OnClickAddNode(mousePosition));
+        genericMenu.AddItem(new GUIContent("Add Connection %#g"), false, () => OnClickAddConnection(mousePosition));
         genericMenu.ShowAsContext();
     }
     void OnClickAddNode(Vector2 mousePosition)
     {
         nodes.Add(new Node(mousePosition, 100, 100, "Node", nodeTexture));
+        lastaChanged = nodes[nodes.Count - 1];
+        prevPos = lastaChanged.position;
     }
     void OnClickAddConnection(Vector2 mousePosition)
     {
         connections.Add(new Connection(mousePosition, mousePosition + new Vector2(20,20)));
         selected = connections[connections.Count - 1];
+        wantsMouseMove = true;
     }
     void SelectNode(Vector2 mousePosition)
     {
+        wantsMouseMove = false;
         foreach (var node in nodes)
         {
             if (node.HasPoint(mousePosition))
